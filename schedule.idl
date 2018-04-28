@@ -1,0 +1,23 @@
+// schedule.idl
+
+module Agenda {
+    interface Schedule {
+        long get_contacts_size();
+        string get_names(in long index);
+        string get_phones(in long index);
+        
+        void search();    
+
+        void add(in string name, in string phone);
+        void external_add(in string name, in string phone);
+
+        void remove(in long index);
+        void external_remove(in long index);
+
+        void edit(in long index, in string name, in string phone);
+        void external_edit(in long index, in string name, in string phone);
+
+        void receive_backup();
+        void isOnline();
+    };   
+};
