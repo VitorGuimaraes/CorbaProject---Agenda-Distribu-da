@@ -5,12 +5,11 @@ from omniORB import CORBA, PortableServer
 import CosNaming, Agenda, Agenda__POA
 import external_client as ext_clt  
 
-name_server = raw_input("Server Name: ")
+name_server = ext_clt.check()
 
 class Schedule(Agenda__POA.Schedule):
     names = []
     phones = []
-    ext_clt.check(name_server)
 
     def get_contacts_size(self):
         return len(self.names)

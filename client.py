@@ -10,14 +10,6 @@ names = ["agenda1", "agenda2", "agenda3"]
 # Initialise the ORB
 orb = CORBA.ORB_init(sys.argv, CORBA.ORB_ID)
 
-# Obtain a reference to the root naming context
-# obj = orb.resolve_initial_references("NameService")
-# rootContext = obj._narrow(CosNaming.NamingContext)
-
-# if rootContext is None:
-#     print "Failed to narrow the root naming context"
-#     sys.exit(1)
-
 #Informa os servidores que estão online
 def onlineServer():
     online_servers = []
@@ -25,9 +17,10 @@ def onlineServer():
         try:
             obj = orb.resolve_initial_references("NameService")
             rootContext = obj._narrow(CosNaming.NamingContext)
-            
+
             name = [CosNaming.NameComponent(server, "context"),
             CosNaming.NameComponent("Schedule", "Object")]
+            
             obj = rootContext.resolve(name)
             object_remote = obj._narrow(Agenda.Schedule)
             object_remote.isOnline()
@@ -38,34 +31,33 @@ def onlineServer():
     for online in online_servers:
         print("Server {} is ONLINE  :D".format(online))
 
-#Conecta a um servidor 
-def bind(server):
+# Conecta a um servidor 
+def bind(main_server):
     try:    
         obj = orb.resolve_initial_references("NameService")
         rootContext = obj._narrow(CosNaming.NamingContext)
-       
-        name = [CosNaming.NameComponent(server, "context"),
+    
+        name = [CosNaming.NameComponent(main_server, "context"),
         CosNaming.NameComponent("Schedule", "Object")]
-       
+    
         obj = rootContext.resolve(name)
         obj = obj._narrow(Agenda.Schedule)
         obj.isOnline()
-        print("\nConectado ao servidor {}".format(server))
 
+        print("\nConectado ao servidor {}".format(main_server))
         # Narrow the object to an Agenda::Schedule
         return obj
 
     except:
-        print("Esse servidor está offline, tente novamente")
-        onlineServer() 
+        print("\n\nO servidor {} caiu, tente novamente".format(main_server))
+        return None
 
-onlineServer()
-server = raw_input("\nServidor escolhido: ")
-eo = bind(server)
+def connect():
+    onlineServer()
+    server_name = raw_input("\nServidor escolhido: ")
+    return server_name
 
-if eo is None:
-    print "Object reference is not an Agenda::Schedule"
-    sys.exit(1)
+main_server = connect()
 
 while True:
     print("1 - Adicionar Contato")
@@ -75,7 +67,12 @@ while True:
     print("5 - Limpar tela")
 
     option = int(raw_input("Opção: "))    
-    
+    eo = bind(main_server)
+
+    if eo is None:
+        main_server = connect()
+        eo = bind(main_server)
+
     if option is 1:
         name  = raw_input("\nNome do contato: ")
         phone = raw_input("Número do contato: ")
