@@ -27,9 +27,9 @@ def onlineServer():
             online_servers.append(server)
 
         except:
-            print("Server {} is offline :(".format(server))
+            print("{} is offline :(".format(server))
     for online in online_servers:
-        print("Server {} is ONLINE  :D".format(online))
+        print("{} is ONLINE  :D \o/ \o/ \o/".format(online))
 
 # Conecta a um servidor 
 def bind(main_server):
@@ -54,8 +54,12 @@ def bind(main_server):
 
 def connect():
     onlineServer()
-    server_name = raw_input("\nServidor escolhido: ")
-    return server_name
+    print("\n*** Escolha o servidor ***")
+    print("1 - agenda1")
+    print("2 - agenda2")
+    print("3 - agenda3")
+    server_name = int(raw_input("\nServidor Selecionado: "))
+    return names[server_name-1] # retorna "agenda1", "agenda2" ou "agenda3"
 
 main_server = connect()
 
@@ -80,18 +84,20 @@ while True:
         eo.external_add(name, phone)
 
     elif option is 2:
-        eo.search()
-        index = int(raw_input("Índice do contato a ser removido: "))
-        eo.remove(index)
-        eo.external_remove(index)
+        if eo.get_contacts_size() > 0:
+            eo.search()
+            index = int(raw_input("Índice do contato a ser removido: "))
+            eo.remove(index)
+            eo.external_remove(index)
 
     elif option is 3:
-        eo.search()
-        index     = int(raw_input("Índice do contato a ser editado: "))
-        new_name  = raw_input("Novo nome do contato: ")
-        new_phone = raw_input("Novo número do contato: ")
-        eo.edit(index, new_name, new_phone)
-        eo.external_edit(index, new_name, new_phone)
+        if eo.get_contacts_size() > 0:
+            eo.search()
+            index     = int(raw_input("Índice do contato a ser editado: "))
+            new_name  = raw_input("Novo nome do contato: ")
+            new_phone = raw_input("Novo número do contato: ")
+            eo.edit(index, new_name, new_phone)
+            eo.external_edit(index, new_name, new_phone)
 
     elif option is 4:
         eo.search()

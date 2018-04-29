@@ -20,13 +20,6 @@ class Schedule(Agenda__POA.Schedule):
     def get_phones(self, index):
         return self.phones[index]
 
-    def search(self):
-        os.system("clear")
-        print("************* Agenda *************")
-        for i in range(len(self.names)):         
-            print(i, self.names[i], self.phones[i])
-        print("**********************************\n")
-
     # Adiciona o contato em si mesmo
     def add(self, name, phone):
         if name not in self.names:
@@ -34,10 +27,35 @@ class Schedule(Agenda__POA.Schedule):
             self.phones.append(phone)
         else:
             print("Já existe um contato com este nome!\n")
-            
-    # Adiciona o contato nas outras agendas
+
+    def remove(self, index):
+        self.search()
+        print("{} removido!".format(self.names[index]))
+        del(self.names[index])
+        del(self.phones[index])
+
+    def edit(self, index, new_name, new_phone):
+        self.names[index] = new_name
+        self.phones[index] = new_phone
+
+    def search(self):
+        os.system("clear")
+        print("************* Agenda *************")
+        for i in range(len(self.names)):         
+            print(i, self.names[i], self.phones[i])
+        print("**********************************\n")
+
+# Métodos que manipulam as outras agendas 
+# (o servidor é cliente das outras agendas)
+
     def external_add(self, name, phone):
         ext_clt.add(name, phone)             
+
+    def external_remove(self, index):
+        ext_clt.remove(index)
+
+    def external_edit(self, index, new_name, new_phone):
+        ext_clt.edit(index, new_name, new_phone)
 
     # Copia os contatos de uma agenda que está online para si mesma
     # Assim quando um agenda cai ela é atualizada por outra que está online
@@ -45,23 +63,6 @@ class Schedule(Agenda__POA.Schedule):
         temp_names, temp_phones = ext_clt.backup()
         if temp_names != None:
             self.names, self.phones = temp_names, temp_phones     
-
-    def remove(self, index):
-        self.search()
-        print("{} removido!".format(self.names[index]))
-        del(self.names[index])
-        del(self.phones[index]) 
-
-    # Remove o contato das outras agendas
-    def external_remove(self, index):
-        ext_clt.remove(index)
-
-    def edit(self, index, new_name, new_phone):
-        self.names[index] = new_name
-        self.phones[index] = new_phone
-    
-    def external_edit(self, index, new_name, new_phone):
-        ext_clt.edit(index, new_name, new_phone)
 
     # Este método é invocado para verificar se o servidor está online. Se der 
     # erro ao tentar invocar, uma exceção será levantada e o usuário será 
@@ -97,7 +98,7 @@ except CosNaming.NamingContext.AlreadyBound, ex:
     context = obj._narrow(CosNaming.NamingContext)
     
     if context is None:
-        print "test.mycontext exists but is not a NamingContext"
+        print "context exists but is not a NamingContext"
         sys.exit(1)
     
 # Bind the object to the context

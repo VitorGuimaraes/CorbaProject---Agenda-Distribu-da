@@ -13,7 +13,7 @@ orb = CORBA.ORB_init(sys.argv, CORBA.ORB_ID)
 def check():
     choose = False
     while not choose:
-        print("***Escolha o servidor ***")
+        print("*** Escolha o servidor ***")
         print("1 - agenda1")
         print("2 - agenda2")
         print("3 - agenda3")
@@ -28,7 +28,6 @@ def check():
 # em uma lista
 def bind():
     remote_obj = []
-    print(names)
     for server_name in names:
         try:
             obj = orb.resolve_initial_references("NameService")
@@ -40,23 +39,41 @@ def bind():
             obj = obj._narrow(Agenda.Schedule)
             obj.isOnline()
             
-            print("{} is up".format(server_name))
+            print("{} is ONLINE  :D \o/ \o/ \o/".format(server_name))
             remote_obj.append(obj)
             
         except:
-            print("Servidor {} is down".format(server_name))
+            print("{} is offline :(".format(server_name))
     return remote_obj
 
 def add(name, phone):
     remote_obj = bind()
-    print("remotes: {}".format(remote_obj))
     if len(remote_obj) > 0:
         for obj in remote_obj:
             # Chama a função add das outras agendas
             obj.add(name, phone)
+            obj.search()
+
+def remove(index_name):
+    remote_obj = bind()
+    if len(remote_obj) > 0:
+        for obj in remote_obj:
+            # Chama a função remove das outras agendas
+            obj.remove(index_name)
+
+def edit(index_name, new_name, new_phone):
+    remote_obj = bind()
+    if len(remote_obj) > 0:
+        for obj in remote_obj:
+            # Chama a função edit das outras agendas
+            obj.edit(index_name, new_name, new_phone)
 
 def backup():
     remote_obj = bind()
+    
+    for obj in remote_obj:
+        obj.receive_backup()
+    
     if len(remote_obj) > 0:
         names = []
         phones = []
@@ -66,17 +83,3 @@ def backup():
             phones.append(remote_obj[0].get_phones(i))
         return names, phones
     return None, None
-            
-def remove(index_name):
-    remote_obj = bind()
-    if len(remote_obj) > 0:
-        for index, obj in enumerate(remote_obj):
-            # Chama a função remove das outras agendas
-            obj[index].remove(index_name)
-
-def edit(index_name, new_name, new_phone):
-    remote_obj = bind()
-    if len(remote_obj) > 0:
-        for index, obj in enumerate(remote_obj):
-            # Chama a função edit das outras agendas
-            obj[index].edit(index_name, new_name, new_phone)
