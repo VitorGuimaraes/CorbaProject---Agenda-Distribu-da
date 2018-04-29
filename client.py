@@ -29,7 +29,7 @@ def onlineServer():
         except:
             print("{} is offline :(".format(server))
     for online in online_servers:
-        print("{} is ONLINE  :D \o/ \o/ \o/".format(online))
+        print("{} is ONLINE  :D".format(online))
 
 # Conecta a um servidor 
 def bind(main_server):
@@ -44,12 +44,12 @@ def bind(main_server):
         obj = obj._narrow(Agenda.Schedule)
         obj.isOnline()
 
-        print("\nConectado ao servidor {}".format(main_server))
+        print("\n***** Conexão estável com o servidor {} *****".format(main_server))
         # Narrow the object to an Agenda::Schedule
         return obj
 
     except:
-        print("\n\nO servidor {} caiu, tente novamente".format(main_server))
+        print("\n ***** O servidor {} está offline, tente novamente *****\n\n".format(main_server))
         return None
 
 def connect():
@@ -59,7 +59,11 @@ def connect():
     print("2 - agenda2")
     print("3 - agenda3")
     server_name = int(raw_input("\nServidor Selecionado: "))
-    return names[server_name-1] # retorna "agenda1", "agenda2" ou "agenda3"
+    if server_name in range(4):
+        return names[server_name-1] # retorna "agenda1", "agenda2" ou "agenda3"
+    else:
+        print("\n***** Este servidor não existe! *****\n\n")
+        return None
 
 main_server = connect()
 
@@ -77,27 +81,37 @@ while True:
         main_server = connect()
         eo = bind(main_server)
 
-    if option is 1:
+    elif option is 1:
         name  = raw_input("\nNome do contato: ")
         phone = raw_input("Número do contato: ")
         eo.add(name, phone)
         eo.external_add(name, phone)
 
     elif option is 2:
-        if eo.get_contacts_size() > 0:
+        if eo.get_contacts_size() == 0:
+            print("\n***** A agenda não possui nenhum contato! *****\n\n")
+        else:
             eo.search()
             index = int(raw_input("Índice do contato a ser removido: "))
-            eo.remove(index)
-            eo.external_remove(index)
+            if index < eo.get_contacts_size():
+                eo.remove(index)
+                eo.external_remove(index)
+            else:
+                print("\n***** Este contato não existe! *****\n\n")
 
     elif option is 3:
-        if eo.get_contacts_size() > 0:
+        if eo.get_contacts_size() == 0:
+            print("\n***** A agenda não possui nenhum contato! *****\n\n")
+        else:
             eo.search()
-            index     = int(raw_input("Índice do contato a ser editado: "))
-            new_name  = raw_input("Novo nome do contato: ")
-            new_phone = raw_input("Novo número do contato: ")
-            eo.edit(index, new_name, new_phone)
-            eo.external_edit(index, new_name, new_phone)
+            index = int(raw_input("Índice do contato a ser editado: "))
+            if index < eo.get_contacts_size():
+                new_name  = raw_input("Novo nome do contato: ")
+                new_phone = raw_input("Novo número do contato: ")
+                eo.edit(index, new_name, new_phone)
+                eo.external_edit(index, new_name, new_phone)
+            else:
+                print("\n***** Este contato não existe *****\n\n")
 
     elif option is 4:
         eo.search()
@@ -106,4 +120,4 @@ while True:
         os.system("clear")
     
     else:
-        print("Opção inválida! Tente novamente!\n")
+        print("\n***** Opção inválida! Tente novamente! ***** \n\n")

@@ -4,12 +4,15 @@ import os
 from omniORB import CORBA, PortableServer
 import CosNaming, Agenda, Agenda__POA
 
-names = ["agenda1", "agenda2", "agenda3"]
+# Define o comportamento cliente que o servidor assume para poder invocar
+# os métodos remotos dos outros servidores agendas
 
+names = ["agenda1", "agenda2", "agenda3"]
 orb = CORBA.ORB_init(sys.argv, CORBA.ORB_ID)
 
-# Remove da lista o nome da agenda que está chamando as funções
-# Assim chamará as funções apenas das outras agendas, e não de si mesma
+# Remove da lista o nome da agenda que está chamando os métodos remotos
+# das demais agenda. Assim chamará os métodos apenas das outras agendas, 
+# e não de si mesma
 def check():
     choose = False
     while not choose:
@@ -39,7 +42,7 @@ def bind():
             obj = obj._narrow(Agenda.Schedule)
             obj.isOnline()
             
-            print("{} is ONLINE  :D \o/ \o/ \o/".format(server_name))
+            print("{} is ONLINE  :D".format(server_name))
             remote_obj.append(obj)
             
         except:
@@ -52,14 +55,13 @@ def add(name, phone):
         for obj in remote_obj:
             # Chama a função add das outras agendas
             obj.add(name, phone)
-            obj.search()
 
 def remove(index_name):
     remote_obj = bind()
     if len(remote_obj) > 0:
         for obj in remote_obj:
             # Chama a função remove das outras agendas
-            obj.remove(index_name)
+            obj.remove(index_name) 
 
 def edit(index_name, new_name, new_phone):
     remote_obj = bind()
@@ -67,12 +69,10 @@ def edit(index_name, new_name, new_phone):
         for obj in remote_obj:
             # Chama a função edit das outras agendas
             obj.edit(index_name, new_name, new_phone)
+            obj.search()
 
 def backup():
     remote_obj = bind()
-    
-    for obj in remote_obj:
-        obj.receive_backup()
     
     if len(remote_obj) > 0:
         names = []

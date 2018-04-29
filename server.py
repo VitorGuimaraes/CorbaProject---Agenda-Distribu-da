@@ -25,19 +25,27 @@ class Schedule(Agenda__POA.Schedule):
         if name not in self.names:
             self.names.append(name)
             self.phones.append(phone)
+            self.search()
+            print("{} adicionado!".format(name))
         else:
-            print("Já existe um contato com este nome!\n")
+            print("\n ***** Já existe um contato com este nome! *****\n\n")
 
+    # Remove o contato de si mesmo
     def remove(self, index):
         self.search()
-        print("{} removido!".format(self.names[index]))
+        removed = self.names[index]
         del(self.names[index])
         del(self.phones[index])
+        self.search()
+        print("{} removido!".format(removed))
 
+    # Edita um contato de si mesmo
     def edit(self, index, new_name, new_phone):
         self.names[index] = new_name
         self.phones[index] = new_phone
+        self.search()
 
+    # Lista os contatos de si mesmo
     def search(self):
         os.system("clear")
         print("************* Agenda *************")
@@ -45,7 +53,7 @@ class Schedule(Agenda__POA.Schedule):
             print(i, self.names[i], self.phones[i])
         print("**********************************\n")
 
-# Métodos que manipulam as outras agendas 
+# Métodos que manipulam os outros servidores agenda 
 # (o servidor é cliente das outras agendas)
 
     def external_add(self, name, phone):
@@ -91,7 +99,6 @@ try:
     name = [CosNaming.NameComponent(name_server, "context")]
     context = rootContext.bind_new_context(name)
     print("New context bounded: {}".format(name_server))
-    bind = 1
 
 except CosNaming.NamingContext.AlreadyBound, ex:
     obj = rootContext.resolve(name)
@@ -102,19 +109,18 @@ except CosNaming.NamingContext.AlreadyBound, ex:
         sys.exit(1)
     
 # Bind the object to the context
-name = [CosNaming.NameComponent("Schedule", "Object")]
 try:
+    name = [CosNaming.NameComponent("Schedule", "Object")]
     context.bind(name, eo)
-    print("New Agenda object bound!")
 
 except CosNaming.NamingContext.AlreadyBound:
     context.rebind(name, eo)
-    print("This binding already exists -- rebound")
 
 # Activate the POA
 poaManager = poa._get_the_POAManager()
 poaManager.activate()
 
+# Recebe os contatos de outra agenda que já estava online
 eo.receive_backup()
 
 # Block for ever (or until the ORB is shut down)
