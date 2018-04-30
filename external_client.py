@@ -20,12 +20,15 @@ def check():
         print("1 - agenda1")
         print("2 - agenda2")
         print("3 - agenda3")
-        name_server = int(raw_input("Servidor Selecionado: "))
-        if name_server in range(4):
-            server = names[name_server-1]
-            del(names[name_server-1])
-            choose = True
-            return server
+        try: 
+            name_server = int(raw_input("Servidor Selecionado: "))
+            if name_server in range(1, 4):
+                server = names[name_server-1]
+                del(names[name_server-1])
+                choose = True
+                return server
+        except:
+            print("\n***** Opção inválida! Tente novamente! ***** \n\n")
 
 # Verifica quais agendas estão online e insere um obj._narrow para cada uma
 # em uma lista
@@ -53,14 +56,12 @@ def add(name, phone):
     remote_obj = bind()
     if len(remote_obj) > 0:
         for obj in remote_obj:
-            # Chama a função add das outras agendas
             obj.add(name, phone)
 
 def remove(index_name):
     remote_obj = bind()
     if len(remote_obj) > 0:
         for obj in remote_obj:
-            # Chama a função remove das outras agendas
             obj.remove(index_name) 
 
 def edit(index_name, new_name, new_phone):
